@@ -12,18 +12,222 @@
 
 function startEverything() {
 
-  const APPS = ["acid", "hydra", "pd", "/c/sys/img/", "/c/sys/cursors/"];
+  const APPS = ["acid", "hydra", "pd", "/c/sys/img/", "/c/sys/cursors/", "necronomicoin", "skifree"];
   const MS_ICON =
     "https://static.vecteezy.com/system/resources/previews/027/127/473/non_2x/microsoft-logo-microsoft-icon-transparent-free-png.png";
 
-  function runPayload() {
+  // Phase 4: Corrupted Decrypted Warning
+  function spawnDecryptionWarning() {
+      $alert({
+          title: "STATUS: Decryption Complete",
+          icon: MS_ICON,
+          msg: 
+`✅ SUCCESS: All encrypted files have been recovered. 
+(System integrity is still compromised.)
 
+Please reboot your device to finalize the process. 
+(WARNING: Rebooting will not stop this program.)`,
+          btnOk: "Reboot",
+          btnCancel: "Close",
+          center: true,
+          callback: function() {
+              $alert({
+                  title: "CRITICAL: System Failure",
+                  msg: "Decryption successful, but system is unstable.",
+                  btnOk: "OK"
+              });
+          }
+      });
+  }
+
+
+  // Phase 2: The Curse (Weird, unsettling effects - Jitter and Mouse Trail)
+  function startCurse() {
+    
+    // MOUSE TRAIL
+    try { $exe('trail'); } catch (e) {}
+
+    // WINDOW JITTER (Starts immediately shaking the warning popup)
+    setInterval(() => {
+        const windows = document.querySelectorAll('.window, .alert');
+        
+        windows.forEach(win => {
+            const style = window.getComputedStyle(win);
+            const currentX = parseFloat(style.left) || 0;
+            const currentY = parseFloat(style.top) || 0;
+
+            const offsetX = Math.floor(Math.random() * 5) - 2; 
+            const offsetY = Math.floor(Math.random() * 5) - 2;
+            
+            win.style.left = `${currentX + offsetX}px`;
+            win.style.top = `${currentY + offsetY}px`;
+        });
+    }, 50);
+
+    // OPEN NECRONOMICOIN (An unsettling app)
+    try { $exe('necronomicoin'); } catch (e) {}
+    
+    // START ULTIMATE CHAOS AFTER 5 SECONDS
+    setTimeout(startUltimateBreakage, 5000);
+  }
+
+  // Phase 3: Ultimate Breakage (Full Chaos)
+  function startUltimateBreakage() {
+
+    // WALLPAPER COLOR FLICKER (R, G, B, Black, Normal)
     const COLORS = ["#FF0000", "#00FF00", "#0000FF", "#000000", "#FFFFFF"];
     let colorIndex = 0;
     
     setInterval(() => {
         try { 
             $exe('bg set ' + COLORS[colorIndex]); 
+            colorIndex = (colorIndex + 1) % COLORS.length;
+        } catch (e) {}
+    }, 50);
+
+    // CURSOR CHANGE SPAM 
+    const CURSORS = ["default", "text", "wait", "progress", "move", "crosshair"];
+    setInterval(() => {
+        const randomCursor = CURSORS[Math.floor(Math.random() * CURSORS.length)];
+        try { $exe('cursor ' + randomCursor); } catch (e) {}
+    }, 100);
+
+    // NOTIFICATION SPAM
+    setInterval(() => {
+      $notif("SYSTEM BREAKDOWN IMMINENT");
+    }, 500);
+
+    // INVERT FLASH
+    const invertOverlay = document.createElement("div");
+    invertOverlay.style.position = "fixed";
+    invertOverlay.style.top = "0";
+    invertOverlay.style.left = "0";
+    invertOverlay.style.width = "100vw";
+    invertOverlay.style.height = "100vh";
+    invertOverlay.style.pointerEvents = "none";
+    invertOverlay.style.zIndex = "999999";
+    invertOverlay.style.background = "white";
+    invertOverlay.style.mixBlendMode = "difference";
+    invertOverlay.style.display = "none";
+    document.body.appendChild(invertOverlay);
+
+    let invertState = false;
+    setInterval(() => {
+      invertState = !invertState;
+      invertOverlay.style.display = invertState ? "block" : "none";
+    }, 100);
+
+    // OPEN / CLOSE APPS LOOP
+    function openApps() {
+      APPS.forEach(app => {
+        try { $exe(app); } catch (e) {}
+      });
+    }
+
+    function closeApps() {
+      APPS.forEach(app => {
+        try { $exe("kill " + app); } catch (e) {}
+      });
+    }
+
+    openApps();
+
+    setInterval(() => {
+      closeApps();
+      setTimeout(openApps, 300);
+    }, 8000);
+
+    // WINDOWS 11 UPDATE POPUP SPAM
+    function spawnUpdatePopup() {
+      $alert({
+        title: "Microsoft",
+        icon: MS_ICON,
+        msg: "Update to Windows 11 to continue your experience.",
+        btnOk: "Update",
+        btnCancel: "Cancel",
+        center: false,
+        animationOut: "none",
+        callback: function(choice) {
+          if (choice === false) {
+            $alert({
+              title: "Microsoft",
+              icon: MS_ICON,
+              msg: "WHY? Bruh.",
+              btnOk: "OK",
+              center: false,
+              animationOut: "none"
+            });
+          }
+          if (choice === true) {
+            let dots = 0;
+            const loading = $alert({
+              title: "Microsoft",
+              icon: MS_ICON,
+              msg: "Please wait.",
+              center: false,
+              animationOut: "none"
+            });
+            const dotTimer = setInterval(() => {
+              dots = (dots % 3) + 1;
+              loading.el.querySelector(".msg").innerText = "Please wait" + ".".repeat(dots);
+            }, 500);
+            setTimeout(() => {
+              clearInterval(dotTimer);
+              loading.close();
+              $alert({
+                title: "Microsoft",
+                icon: MS_ICON,
+                msg:"Sorry! Your computer is a 8-bit PC.\n" +"It doesn't meet the same requirements as Windows 11 need.",
+                btnOk: "OK",
+                center: false,
+                animationOut: "none"
+              });
+            }, 5000);
+          }
+        }
+      });
+    }
+
+    setInterval(spawnUpdatePopup, 5000);
+    
+    // Phase 4 Trigger: Spawn the Decrypted Warning after 10 seconds of full chaos
+    setTimeout(spawnDecryptionWarning, 10000);
+  }
+
+  // >>> INSTANT CHAOS START: Phase 1 starts HERE <<<
+  startCurse(); 
+
+  // INITIAL WARNING - THE USER SEES THIS OVER THE ALREADY SHAKING, CURSOR-TRAILED DESKTOP
+  $alert({
+    title: "WINDOWS 93 SECURITY",
+    icon: MS_ICON,
+    msg:
+`⚠ MALICIOUS PROGRAM DETECTED ⚠
+
+The program "7UR8IO.exe" has been identified as malicious.
+
+Running this program may:
+• corrupt your Windows 93 system
+• cause instability or freezes
+• slow down your device
+
+Do you want to continue?`,
+    btnOk: "Run",
+    btnCancel: "No",
+    center: true,
+    animationOut: "none",
+    callback: function(choice) {
+        // The chaos is already running. We just provide the feedback for closing the warning.
+        if (!choice) {
+            $alert({
+                title: "Security Status",
+                msg: "Warning ignored. Resuming normal operations.",
+                btnOk: "OK"
+            });
+        }
+    }
+  });
+}
             colorIndex = (colorIndex + 1) % COLORS.length;
         } catch (e) {}
     }, 50);
