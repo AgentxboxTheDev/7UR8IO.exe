@@ -9,7 +9,7 @@ wait for boot screen
 you'll get the desktop
 
 **step 2:**
-double click terminal, then copy and paste the code from
+double click terminal, then copy and paste the code from **script.txt**
                         
 **step 3:**
 press enter when you pasted this script
