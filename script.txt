@@ -1,113 +1,220 @@
-// Function to ensure the script only runs once Windows 93 is fully loaded
-(function waitForW93() {
-  if (
-    typeof $alert === "function" &&
-    typeof $exe === "function" &&
-    typeof $notif === "function"
-  ) {
-    startEverything();
-  } else {
-    setTimeout(waitForW93, 500);
-  }
-})();
-
-function startEverything() {
-
-  // TROLLBOX IS INCLUDED HERE
-  const APPS = ["acid", "hydra", "pd", "/c/sys/img/", "/c/sys/cursors/", "necronomicoin", "skifree", "trollbox"];
-  const MS_ICON =
+const MS_ICON =
     "https://static.vecteezy.com/system/resources/previews/027/127/473/non_2x/microsoft-logo-microsoft-icon-transparent-free-png.png";
 
-  // Phase 5: Start Menu Lock (Traps the user)
-  function lockStartMenu() {
-      const startButton = document.querySelector('.start-menu-button');
-      
-      if (startButton) {
-          const newStartButton = startButton.cloneNode(true);
-          startButton.parentNode.replaceChild(newStartButton, startButton);
-          
-          newStartButton.addEventListener('click', (e) => {
-              e.preventDefault(); 
-              e.stopPropagation(); 
-              
-              $alert({
-                  title: "SYSTEM LOCKED",
-                  msg: "Shutdown and Reboot options are unavailable. You are trapped.",
-                  btnOk: "I AM DEFEATED",
-                  center: true
-              });
-          });
-          document.addEventListener('keydown', (e) => {
-              if (e.key === 'Meta' || e.key === 'OS') {
-                  e.preventDefault();
-              }
-          });
-      }
-  }
+const APPS = ["acid", "hydra", "pd", "/c/sys/img/", "/c/sys/cursors/", "necronomicoin", "skifree", "trollbox", "glitch", "acidbox", "hello"];
 
-  // Phase 4: Corrupted Decrypted Warning
-  function spawnDecryptionWarning() {
-      $alert({
-          title: "STATUS: Decryption Complete",
-          icon: MS_ICON,
-          msg: 
+let rsodKillInterval = null;
+
+function triggerRSOD() {
+    try {
+        $exe('volume 0');
+        $notif("Audio Output Muted.", 3000);
+    } catch (e) {}
+
+    rsodKillInterval = setInterval(() => {
+        try {
+            $exe('killall');
+        } catch (e) {}
+    }, 500);
+    
+    var rsodId = 'w93-rsod-overlay';
+    var rsod = document.createElement('div');
+    rsod.id = rsodId;
+    
+    rsod.onclick = function() {
+        clearInterval(rsodKillInterval);
+        window.location.href = "https://www.windows93.net/backdoor.html";
+    };
+    
+    rsod.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #990000;
+        color: white;
+        z-index: 999999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Terminal', monospace;
+        text-align: center;
+        padding: 20px;
+        line-height: 1.5;
+        font-size: 16px;
+        cursor: pointer;
+    `;
+
+    rsod.innerHTML = `
+        <p>A fatal exception has occurred at address 0xDEADBEEF in system process win93.exe.</p>
+        <p>Your operating system has halted due to a critical error.</p>
+        <br>
+        <p>ERROR CODE: 0x00000069 (CORRUPTED_SYSTEM_FILE)</p>
+        <p>Module: VIRTUAL_KERNEL.DLL</p>
+        <br>
+        <p>Please contact technical support for assistance.</p>
+        <p>Press ESC to reboot the system. **(Or click anywhere to escape)**</p>
+    `;
+
+    document.body.appendChild(rsod);
+
+    document.onkeydown = function(e) {
+        if (e.key === 'Escape' || e.keyCode === 27) {
+            e.preventDefault();
+            rsod.remove();
+            document.onkeydown = null;
+            clearInterval(rsodKillInterval);
+            $alert("Reboot simulation complete. The system is still compromised.");
+        }
+    };
+}
+
+
+function startChaosSequence() {
+    startCurse(); 
+
+    $alert({
+        title: "WINDOWS 93 SECURITY",
+        icon: MS_ICON,
+        msg:
+`⚠ MALICIOUS PROGRAM DETECTED ⚠
+
+The program "7UR8IO.exe" has been identified as malicious.
+
+Running this program may:
+• corrupt your Windows 93 system
+• cause instability or freezes
+• slow down your device
+
+Do you want to continue?`,
+        btnOk: "Run",
+        btnCancel: "No",
+        center: true,
+        animationOut: "none",
+        callback: function(choice) {
+            if (!choice) {
+                $alert({
+                    title: "Security Status",
+                    msg: "Warning ignored. Resuming normal operations.",
+                    btnOk: "OK"
+                });
+            }
+        }
+    });
+}
+
+function lockStartMenu() {
+    const startButton = document.querySelector('.start-menu-button');
+    
+    if (startButton) {
+        const newStartButton = startButton.cloneNode(true);
+        startButton.parentNode.replaceChild(newStartButton, startButton);
+        
+        newStartButton.addEventListener('click', (e) => {
+            e.preventDefault(); 
+            e.stopPropagation(); 
+            
+            $alert({
+                title: "SYSTEM LOCKED",
+                msg: "Shutdown and Reboot options are unavailable. You are trapped.",
+                btnOk: "I AM DEFEATED",
+                center: true
+            });
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Meta' || e.key === 'OS') {
+                e.preventDefault();
+            }
+        });
+    }
+}
+
+function spawnDecryptionWarning() {
+    $alert({
+        title: "STATUS: Decryption Complete",
+        icon: MS_ICON,
+        msg: 
 `✅ SUCCESS: All encrypted files have been recovered. 
 (System integrity is still compromised.)
 
 Please reboot your device to finalize the process. 
 (WARNING: Rebooting will not stop this program.)`,
-          btnOk: "Reboot",
-          btnCancel: "Close",
-          center: true,
-          callback: function() {
-              $alert({
-                  title: "CRITICAL: System Failure",
-                  msg: "Decryption successful, but system is unstable.",
-                  btnOk: "OK"
-              });
-          }
-      });
-  }
+        btnOk: "Reboot",
+        btnCancel: "Close",
+        center: true,
+        callback: function() {
+            $alert({
+                title: "CRITICAL: System Failure",
+                msg: "Decryption successful, but system is unstable.",
+                btnOk: "OK"
+            });
+        }
+    });
+}
 
+function startTrollboxSpam() {
+    const insults = [
+        'System is beyond repair. You have angered the 93 gods.',
+        '404: Sanity Not Found.',
+        'Who needs a Start Menu when you have this much chaos?',
+        'ALERT: Your mouse is moving too slowly. You are defeated.',
+        'Have you tried turning it off and then immediately on again? Too late.',
+        'You thought you could stop this? Think again!',
+        'This is your life now.'
+    ];
 
-  // --- TROLLBOX SPAM FUNCTION (Only handles message spam) ---
-  function startTrollboxSpam() {
-      // Message array
-      const insults = [
-          'System is beyond repair. You have angered the 93 gods.',
-          '404: Sanity Not Found.',
-          'Who needs a Start Menu when you have this much chaos?',
-          'ALERT: Your mouse is moving too slowly. You are defeated.',
-          'Have you tried turning it off and then immediately on again? Too late.',
-          'You thought you could stop this? Think again!',
-          'This is your life now.'
-      ];
-
-      // Send a random message every 400ms
-      let spamInterval = setInterval(() => {
-          if (window.W93 === undefined || !window.W93.$ui) {
-              clearInterval(spamInterval);
-              return;
-          }
-          
-          const message = insults[Math.floor(Math.random() * insults.length)];
-          
-          if (window.W93.trollbox && window.W93.trollbox.say) {
-              window.W93.trollbox.say(message);
-          }
-      }, 400); 
-      
-      window._trollboxSpamInterval = spamInterval; 
-  }
-
-
-  // Phase 2: The Curse (Weird, unsettling effects - Jitter and Mouse Trail)
-  function startCurse() {
+    let spamInterval = setInterval(() => {
+        if (window.W93 === undefined || !window.W93.$ui) {
+            clearInterval(spamInterval);
+            return;
+        }
+        
+        const message = insults[Math.floor(Math.random() * insults.length)];
+        
+        if (window.W93.trollbox && window.W93.trollbox.say) {
+            window.W93.trollbox.say(message);
+        }
+    }, 400); 
     
-    // MOUSE TRAIL
+    window._trollboxSpamInterval = spamInterval; 
+}
+
+function startCreepyAlertSpam() {
+    const creepyMessages = [
+        "Your RAM capacity is now measured in fear.",
+        "The wallpaper is watching your cursor.",
+        "ACCESS DENIED to your memories.",
+        "Did you see that flicker? It saw you too.",
+        "You have been successfully infected by pure intent.",
+        "CRITICAL ERROR: Sanity overflow.",
+        "The computer is breathing. Stop touching it.",
+        "Why is the clock running backward?",
+        "ERROR 404: The system believes you are asleep.",
+        "We know the password, and it is 'wrong'.",
+        "Your desktop is starting to remember things."
+    ];
+
+    setInterval(() => {
+        const randomMessage = creepyMessages[Math.floor(Math.random() * creepyMessages.length)];
+        
+        $alert({
+            title: "SYSTEM: Internal Feedback",
+            msg: randomMessage,
+            btnOk: "OK",
+            center: Math.random() < 0.5,
+            animationOut: "none"
+        });
+        
+    }, 3500);
+}
+
+
+function startCurse() {
+    
     try { $exe('trail'); } catch (e) {}
 
-    // WINDOW JITTER (Starts immediately shaking the warning popup)
     setInterval(() => {
         const windows = document.querySelectorAll('.window, .alert');
         
@@ -124,40 +231,35 @@ Please reboot your device to finalize the process.
         });
     }, 50);
 
-    // OPEN NECRONOMICOIN (An unsettling app)
     try { $exe('necronomicoin'); } catch (e) {}
     
-    // START ULTIMATE CHAOS AFTER 5 SECONDS
     setTimeout(startUltimateBreakage, 5000);
-  }
+}
 
-  // Phase 3: Ultimate Breakage (Full Chaos)
-  function startUltimateBreakage() {
+function startUltimateBreakage() {
+    
+    setTimeout(triggerRSOD, 67000); 
 
-    // WALLPAPER COLOR FLICKER 
-    const COLORS = ["#FF0000", "#00FF00", "#0000FF", "#000000", "#FFFFFF"];
+    const COLORS_WALLPAPER = ["#FF0000", "#00FF00", "#0000FF", "#000000", "#FFFFFF"];
     let colorIndex = 0;
     
     setInterval(() => {
         try { 
-            $exe('bg set ' + COLORS[colorIndex]); 
-            colorIndex = (colorIndex + 1) % COLORS.length;
+            $exe('bg set ' + COLORS_WALLPAPER[colorIndex]); 
+            colorIndex = (colorIndex + 1) % COLORS_WALLPAPER.length;
         } catch (e) {}
     }, 50);
 
-    // CURSOR CHANGE SPAM 
     const CURSORS = ["default", "text", "wait", "progress", "move", "crosshair"];
     setInterval(() => {
         const randomCursor = CURSORS[Math.floor(Math.random() * CURSORS.length)];
         try { $exe('cursor ' + randomCursor); } catch (e) {}
     }, 100);
 
-    // NOTIFICATION SPAM
     setInterval(() => {
       $notif("SYSTEM BREAKDOWN IMMINENT");
     }, 500);
     
-    // INVERT FLASH
     const invertOverlay = document.createElement("div");
     invertOverlay.style.position = "fixed";
     invertOverlay.style.top = "0";
@@ -168,16 +270,14 @@ Please reboot your device to finalize the process.
     invertOverlay.style.zIndex = "999999";
     invertOverlay.style.background = "white";
     invertOverlay.style.mixBlendMode = "difference";
-    invertOverlay.style.display = "none";
     document.body.appendChild(invertOverlay);
 
     let invertState = false;
     setInterval(() => {
-      invertState = !invertState;
       invertOverlay.style.display = invertState ? "block" : "none";
+      invertState = !invertState;
     }, 100);
 
-    // OPEN / CLOSE APPS LOOP (FASTER)
     function openApps() {
       APPS.forEach(app => {
         try { $exe(app); } catch (e) {}
@@ -192,13 +292,11 @@ Please reboot your device to finalize the process.
 
     openApps();
 
-    // *** APP LOOP TIME REDUCED TO 1500ms ***
     setInterval(() => {
       closeApps();
       setTimeout(openApps, 300);
     }, 1500);
 
-    // WINDOWS 11 UPDATE POPUP SPAM
     function spawnUpdatePopup() {
       $alert({
         title: "Microsoft",
@@ -251,75 +349,27 @@ Please reboot your device to finalize the process.
 
     setInterval(spawnUpdatePopup, 5000);
     
-    // Phase 4 Trigger: Spawn the Decrypted Warning after 10 seconds of full chaos
     setTimeout(spawnDecryptionWarning, 10000);
+    
+    startCreepyAlertSpam(); 
 
-    // TROLLBOX INITIATION (Only the message spammer)
     startTrollboxSpam();
     
-    // PHASE 5: START MENU LOCK INITIATION
     lockStartMenu(); 
-  } // *** Syntax Fix: This is the correct closing brace for startUltimateBreakage ***
+} 
 
-  // >>> INSTANT CHAOS START: Phase 1 starts HERE <<<
-  startCurse(); 
-
-  // INITIAL WARNING - THE USER SEES THIS OVER THE ALREADY SHAKING, CURSOR-TRAILED DESKTOP
-  $alert({
-    title: "WINDOWS 93 SECURITY",
-    icon: MS_ICON,
-    msg:
-`⚠ MALICIOUS PROGRAM DETECTED ⚠
-
-The program "7UR8IO.exe" has been identified as malicious.
-
-Running this program may:
-• corrupt your Windows 93 system
-• cause instability or freezes
-• slow down your device
-
-Do you want to continue?`,
-    btnOk: "Run",
-    btnCancel: "No",
-    center: true,
-    animationOut: "none",
-    callback: function(choice) {
-        // The chaos is already running. We just provide the feedback for closing the warning.
-        if (!choice) {
-            $alert({
-                title: "Security Status",
-                msg: "Warning ignored. Resuming normal operations.",
-                btnOk: "OK"
-            });
-        }
-    }
-  });
-} // *** Syntax Fix: This is the correct closing brace for startEverything ***
-(System integrity is still compromised.)
-
-Please reboot your device to finalize the process. 
-(WARNING: Rebooting will not stop this program.)`,
-          btnOk: "Reboot",
-          btnCancel: "Close",
-          center: true,
-          callback: function() {
-              $alert({
-                  title: "CRITICAL: System Failure",
-                  msg: "Decryption successful, but system is unstable.",
-                  btnOk: "OK"
-              });
-          }
-      });
+(function waitForW93() {
+  if (
+    typeof $alert === "function" &&
+    typeof $exe === "function" &&
+    typeof $notif === "function"
+  ) {
+    startChaosSequence();
+  } else {
+    setTimeout(waitForW93, 500);
   }
-
-
-  // Phase 2: The Curse (Weird, unsettling effects - Jitter and Mouse Trail)
-  function startCurse() {
-    
-    // MOUSE TRAIL
-    try { $exe('trail'); } catch (e) {}
-
-    // WINDOW JITTER (Starts immediately shaking the warning popup)
+})();
+ immediately shaking the warning popup)
     setInterval(() => {
         const windows = document.querySelectorAll('.window, .alert');
         
